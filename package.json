@@ -1,0 +1,22 @@
+{
+  "name": "@pch18/request",
+  "version": "1.0.0",
+  "description": "pch18",
+  "keywords": [],
+  "main": "build/app.js",
+  "scripts": {
+    "test": "ts-node test/app.ts",
+    "start": "node build/app.js",
+    "prepublish": "tsc"
+  },
+  "author": "pch18 <pch18@qq.com> (https://pch18.cn/)",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "latest",
+    "ts-node": "latest",
+    "typescript": "latest"
+  },
+  "directories": {
+    "test": "test"
+  }
+}
