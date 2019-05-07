@@ -1,3 +1,6 @@
+/// <reference types="node" />
+import http = require('http');
+import https = require('https');
 declare type stringQuery = {
     [x: string]: string;
 };
@@ -15,6 +18,11 @@ interface request_opts {
     parseJson?: boolean;
     cookies?: Cookies;
     headers?: baseQuery;
+    auth?: {
+        user: string;
+        pass: string;
+    };
+    other?: http.RequestOptions | https.RequestOptions;
 }
 export declare class Request {
     static get(uri: string, opts?: {

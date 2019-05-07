@@ -42,10 +42,10 @@ class Request {
             throw new Error(`请求的uri必须是http://或者https://开头,传入的[${opts.uri}]不能识别`);
         }
         return new Promise((resolve, reject) => {
-            const req = httpORs.request(opts.uri, {
+            const req = httpORs.request(opts.uri, Object.assign({}, opts.other || {}, opts.auth ? { auth: `${opts.auth.user}:${opts.auth.pass}` } : {}, {
                 method: opts.method,
-                headers: Object.assign({}, opts.headers, opts.cookies ? { Cookie: opts.cookies.stringify() } : {})
-            }, (res) => __awaiter(this, void 0, void 0, function* () {
+                headers: Object.assign({}, opts.headers, opts.cookies ? { Cookie: opts.cookies.stringify() } : {}),
+            }), (res) => __awaiter(this, void 0, void 0, function* () {
                 // res.setEncoding('utf8')
                 // console.log(res)
                 if (opts.cookies && res.headers['set-cookie']) {
