@@ -80,7 +80,10 @@ export class Request {
                                 rawData = JSON.parse(rawData)
                                 resolve(rawData)
                             } catch{
-                                reject(new Error(`json解析失败 => ${rawData}`))
+                                reject(Object.assign(
+                                    new Error(`json解析失败 => ${rawData}`),
+                                    { data: rawData }
+                                ))
                             }
                         } else {
                             resolve(rawData)
@@ -101,7 +104,10 @@ export class Request {
                         query: {}
                     })))
                 } else { //错误代码
-                    reject(new Error(`返回的httpCode为${res.statusCode}`))
+                    reject(Object.assign(
+                        new Error(`返回的httpCode为${res.statusCode}`),
+                        { code: res.statusCode }
+                    ))
                 }
             }).on('error', e => {
                 e.message = `请求[${opts.uri}]失败 ` + e.message
