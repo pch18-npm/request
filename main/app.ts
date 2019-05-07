@@ -9,13 +9,20 @@ type superQuery = { [x: string]: baseQuery }
 
 interface request_opts {
     method: 'GET' | 'POST',
-    uri: string,
-    query?: baseQuery,
-    postData?: superQuery,
+    uri: string
+    query?: baseQuery
+    postData?: superQuery
 
-    parseJson?: boolean,
-    cookies?: Cookies,
+    parseJson?: boolean
+    cookies?: Cookies
     headers?: baseQuery
+
+    auth?: {
+        user: string
+        pass: string
+    }
+
+    other?: http.RequestOptions | https.RequestOptions
 }
 
 export class Request {
@@ -50,10 +57,15 @@ export class Request {
         }
 
         return new Promise<string>((resolve, reject) => {
-            const req = httpORs.request(opts.uri, {
-                method: opts.method,
-                headers: Object.assign({}, opts.headers, opts.cookies ? { Cookie: opts.cookies.stringify() } : {})
-            }, async (res) => {
+            const req = httpORs.request(opts.uri, Object.assign(
+                {},
+                opts.other || {},
+                opts.auth ? { auth: `${opts.auth.user}:${opts.auth.pass}` } : {},
+                {
+                    method: opts.method,
+                    headers: Object.assign({}, opts.headers, opts.cookies ? { Cookie: opts.cookies.stringify() } : {}),
+                }
+            ), async (res) => {
                 // res.setEncoding('utf8')
                 // console.log(res)
                 if (opts.cookies && res.headers['set-cookie']) {
