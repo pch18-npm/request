@@ -6,7 +6,9 @@ import https = require('https')
 (async () => {
     // const back_baidu = await Request.get('https://baidu.com')
     // console.log(back_baidu)
-    const back = await Request.get('https://api.github.com/users/pch18')
+    const back = await Request.get('https://api.github.com/users/pch18', {
+        debug: true
+    })
     console.log(back)
 })()
 

@@ -22,6 +22,7 @@ interface request_opts {
         user: string;
         pass: string;
     };
+    debug?: boolean;
     other?: http.RequestOptions | https.RequestOptions;
 }
 export declare class Request {

@@ -22,6 +22,7 @@ interface request_opts {
         pass: string
     }
 
+    debug?: boolean
     other?: http.RequestOptions | https.RequestOptions
 }
 
@@ -78,7 +79,9 @@ export class Request {
                     ),
                 }
             ), async (res) => {
-                // console.log(res)
+                if (opts.debug) {
+                    console.log(res)
+                }
                 if (opts.cookies && res.headers['set-cookie']) {
                     opts.cookies.setRaw(res.headers['set-cookie'])
                 }

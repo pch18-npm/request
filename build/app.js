@@ -60,7 +60,9 @@ class Request {
                     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36'
                 }, opts.headers, opts.cookies ? { Cookie: opts.cookies.stringify() } : {}),
             }), (res) => __awaiter(this, void 0, void 0, function* () {
-                // console.log(res)
+                if (opts.debug) {
+                    console.log(res);
+                }
                 if (opts.cookies && res.headers['set-cookie']) {
                     opts.cookies.setRaw(res.headers['set-cookie']);
                 }
