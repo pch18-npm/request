@@ -86,22 +86,7 @@ export class Request {
                 if (opts.cookies && res.headers['set-cookie']) {
                     opts.cookies.setRaw(res.headers['set-cookie'])
                 }
-                const func_allowCode = () => {
-                    if (res.statusCode === 200) {
-                        return true
-                    } else if (res.statusCode && opts.allowCode && opts.allowCode.includes(res.statusCode)) {
-                        return true
-                    } else {
-                        return false
-                    }
-                }
-                if (func_allowCode()) { // 返回200
-                    let rawData = Buffer.alloc(0);
-                    res.on('data', (chunk) => { rawData = Buffer.concat([rawData, chunk]) });
-                    res.on('end', () => {
-                        resolve(rawData)
-                    })
-                } else if (res.statusCode === 301 || res.statusCode === 302) { //返回跳转
+                if (res.statusCode === 301 || res.statusCode === 302) { //返回跳转
                     let jumpUri = null
                     if (res.headers.location && /https?:\/\//.test(res.headers.location)) {
                         jumpUri = res.headers.location
@@ -115,6 +100,16 @@ export class Request {
                         uri: jumpUri,
                         query: {}
                     })))
+                } else if (
+                    res.statusCode == 200 || (
+                        res.statusCode && opts.allowCode && opts.allowCode.includes(res.statusCode)
+                    )
+                ) { // 返回200
+                    let rawData = Buffer.alloc(0);
+                    res.on('data', (chunk) => { rawData = Buffer.concat([rawData, chunk]) });
+                    res.on('end', () => {
+                        resolve(rawData)
+                    })
                 } else { //错误代码
                     reject(Object.assign(
                         new Error(`返回的httpCode为${res.statusCode}`),
