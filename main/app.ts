@@ -76,7 +76,7 @@ export class Request {
         buffer: Buffer
     }>
     static async post(uri: string, postData: superQuery, opts: any = {}) {
-        const content = await this.request(Object.assign(opts, { method: 'POST', uri }))
+        const content = await this.request(Object.assign(opts, { method: 'POST', uri, postData }))
         const rawData = {
             code: content.res.statusCode,
             headers: content.res.headers,
@@ -95,7 +95,7 @@ export class Request {
         buffer: Buffer
     }>
     static async post_json(uri: string, postData: superQuery, opts: any = {}) {
-        const content = await this.request(Object.assign(opts, { method: 'POST', uri }))
+        const content = await this.request(Object.assign(opts, { method: 'POST', uri, postData }))
         const rawData = {
             code: content.res.statusCode,
             headers: content.res.headers,

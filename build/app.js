@@ -39,7 +39,7 @@ class Request {
     }
     static post(uri, postData, opts = {}) {
         return __awaiter(this, void 0, void 0, function* () {
-            const content = yield this.request(Object.assign(opts, { method: 'POST', uri }));
+            const content = yield this.request(Object.assign(opts, { method: 'POST', uri, postData }));
             const rawData = {
                 code: content.res.statusCode,
                 headers: content.res.headers,
@@ -51,7 +51,7 @@ class Request {
     }
     static post_json(uri, postData, opts = {}) {
         return __awaiter(this, void 0, void 0, function* () {
-            const content = yield this.request(Object.assign(opts, { method: 'POST', uri }));
+            const content = yield this.request(Object.assign(opts, { method: 'POST', uri, postData }));
             const rawData = {
                 code: content.res.statusCode,
                 headers: content.res.headers,
