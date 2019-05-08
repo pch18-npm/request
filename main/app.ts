@@ -23,7 +23,7 @@ interface request_opts {
     }
 
     debug?: boolean
-    allowCode?: number[],
+    allowCode?: number[] | ((code: number) => boolean),
     other?: http.RequestOptions | https.RequestOptions
 }
 
@@ -101,8 +101,10 @@ export class Request {
                         query: {}
                     })))
                 } else if (
-                    res.statusCode == 200 || (
-                        res.statusCode && opts.allowCode && opts.allowCode.includes(res.statusCode)
+                    res.statusCode && (
+                        res.statusCode == 200 ||
+                        (opts.allowCode instanceof Array && opts.allowCode.includes(res.statusCode)) ||
+                        (typeof opts.allowCode == 'function' && opts.allowCode(res.statusCode))
                     )
                 ) { // 返回200
                     let rawData = Buffer.alloc(0);
