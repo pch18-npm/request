@@ -29,25 +29,82 @@ interface request_opts {
 
 export class Request {
 
-    static async get(uri: string, opts: { [x in keyof request_opts]?: request_opts[x] } = {}) {
+    //get
+    static async get(uri: string, opts?: { [x in keyof request_opts]?: request_opts[x] }): Promise<string>
+    static async get(uri: string, opts: { [x in keyof request_opts]?: request_opts[x] } & { raw: true }): Promise<{
+        code: number
+        headers: http.IncomingHttpHeaders
+        data: string
+        buffer: Buffer
+    }>
+    static async get(uri: string, opts: any = {}) {
         const content = await this.request(Object.assign(opts, { method: 'GET', uri }))
-        return content.toString()
+        const rawData = {
+            code: content.res.statusCode,
+            headers: content.res.headers,
+            data: content.buffer.toString(),
+            buffer: content.buffer,
+        }
+        return opts.raw ? rawData : rawData.data
     }
 
-    static async get_json<T extends Object>(uri: string, opts: { [x in keyof request_opts]?: request_opts[x] } = {}) {
-        const content = await this.request(Object.assign(opts, { method: 'GET', uri, parseJson: true })) as any as Promise<T>
-        return JSON.parse(content.toString())
+    //get_json
+    static async get_json(uri: string, opts?: { [x in keyof request_opts]?: request_opts[x] }): Promise<string>
+    static async get_json(uri: string, opts: { [x in keyof request_opts]?: request_opts[x] } & { raw: true }): Promise<{
+        code: number
+        headers: http.IncomingHttpHeaders
+        data: string
+        buffer: Buffer
+    }>
+    static async get_json(uri: string, opts: any = {}) {
+        const content = await this.request(Object.assign(opts, { method: 'GET', uri }))
+        const rawData = {
+            code: content.res.statusCode,
+            headers: content.res.headers,
+            data: JSON.parse(content.buffer.toString()),
+            buffer: content.buffer,
+        }
+        return opts.raw ? rawData : rawData.data
     }
 
-    static async post(uri: string, postData: superQuery, opts: { [x in keyof request_opts]?: request_opts[x] } = {}) {
-        const content = await this.request(Object.assign(opts, { method: 'POST', uri, postData }))
-        return content.toString()
+    //post
+    static async post(uri: string, postData: superQuery, opts?: { [x in keyof request_opts]?: request_opts[x] }): Promise<string>
+    static async post(uri: string, postData: superQuery, opts: { [x in keyof request_opts]?: request_opts[x] } & { raw: true }): Promise<{
+        code: number
+        headers: http.IncomingHttpHeaders
+        data: string
+        buffer: Buffer
+    }>
+    static async post(uri: string, postData: superQuery, opts: any = {}) {
+        const content = await this.request(Object.assign(opts, { method: 'POST', uri }))
+        const rawData = {
+            code: content.res.statusCode,
+            headers: content.res.headers,
+            data: content.buffer.toString(),
+            buffer: content.buffer,
+        }
+        return opts.raw ? rawData : rawData.data
     }
 
-    static async post_json<T extends Object>(uri: string, postData: superQuery, opts: { [x in keyof request_opts]?: request_opts[x] } = {}) {
-        const content = await this.request(Object.assign(opts, { method: 'POST', uri, postData, parseJson: true })) as any as Promise<T>
-        return JSON.parse(content.toString())
+    //post_json
+    static async post_json(uri: string, postData: superQuery, opts?: { [x in keyof request_opts]?: request_opts[x] }): Promise<string>
+    static async post_json(uri: string, postData: superQuery, opts: { [x in keyof request_opts]?: request_opts[x] } & { raw: true }): Promise<{
+        code: number
+        headers: http.IncomingHttpHeaders
+        data: string
+        buffer: Buffer
+    }>
+    static async post_json(uri: string, postData: superQuery, opts: any = {}) {
+        const content = await this.request(Object.assign(opts, { method: 'POST', uri }))
+        const rawData = {
+            code: content.res.statusCode,
+            headers: content.res.headers,
+            data: JSON.parse(content.buffer.toString()),
+            buffer: content.buffer,
+        }
+        return opts.raw ? rawData : rawData.data
     }
+
 
     static request(opts: request_opts) {
         const url_data = url.parse(opts.uri)
@@ -64,7 +121,10 @@ export class Request {
             throw new Error(`请求的uri必须是http://或者https://开头,传入的[${opts.uri}]不能识别`)
         }
 
-        return new Promise<Buffer>((resolve, reject) => {
+        return new Promise<{
+            buffer: Buffer,
+            res: http.IncomingMessage
+        }>((resolve, reject) => {
             const req = httpORs.request(opts.uri, Object.assign(
                 {},
                 opts.other || {},
@@ -107,10 +167,12 @@ export class Request {
                         (typeof opts.allowCode == 'function' && opts.allowCode(res.statusCode))
                     )
                 ) { // 返回200
-                    let rawData = Buffer.alloc(0);
-                    res.on('data', (chunk) => { rawData = Buffer.concat([rawData, chunk]) });
+                    let buffer = Buffer.alloc(0);
+                    res.on('data', (chunk) => { buffer = Buffer.concat([buffer, chunk]) });
                     res.on('end', () => {
-                        resolve(rawData)
+                        resolve({
+                            buffer, res
+                        })
                     })
                 } else { //错误代码
                     reject(Object.assign(

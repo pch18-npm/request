@@ -30,16 +30,59 @@ export declare class Request {
     static get(uri: string, opts?: {
         [x in keyof request_opts]?: request_opts[x];
     }): Promise<string>;
-    static get_json<T extends Object>(uri: string, opts?: {
+    static get(uri: string, opts: {
         [x in keyof request_opts]?: request_opts[x];
-    }): Promise<any>;
+    } & {
+        raw: true;
+    }): Promise<{
+        code: number;
+        headers: http.IncomingHttpHeaders;
+        data: string;
+        buffer: Buffer;
+    }>;
+    static get_json(uri: string, opts?: {
+        [x in keyof request_opts]?: request_opts[x];
+    }): Promise<string>;
+    static get_json(uri: string, opts: {
+        [x in keyof request_opts]?: request_opts[x];
+    } & {
+        raw: true;
+    }): Promise<{
+        code: number;
+        headers: http.IncomingHttpHeaders;
+        data: string;
+        buffer: Buffer;
+    }>;
     static post(uri: string, postData: superQuery, opts?: {
         [x in keyof request_opts]?: request_opts[x];
     }): Promise<string>;
-    static post_json<T extends Object>(uri: string, postData: superQuery, opts?: {
+    static post(uri: string, postData: superQuery, opts: {
         [x in keyof request_opts]?: request_opts[x];
-    }): Promise<any>;
-    static request(opts: request_opts): Promise<Buffer>;
+    } & {
+        raw: true;
+    }): Promise<{
+        code: number;
+        headers: http.IncomingHttpHeaders;
+        data: string;
+        buffer: Buffer;
+    }>;
+    static post_json(uri: string, postData: superQuery, opts?: {
+        [x in keyof request_opts]?: request_opts[x];
+    }): Promise<string>;
+    static post_json(uri: string, postData: superQuery, opts: {
+        [x in keyof request_opts]?: request_opts[x];
+    } & {
+        raw: true;
+    }): Promise<{
+        code: number;
+        headers: http.IncomingHttpHeaders;
+        data: string;
+        buffer: Buffer;
+    }>;
+    static request(opts: request_opts): Promise<{
+        buffer: Buffer;
+        res: http.IncomingMessage;
+    }>;
 }
 export declare class Cookies {
     private rows;

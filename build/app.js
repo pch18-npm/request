@@ -16,25 +16,49 @@ class Request {
     static get(uri, opts = {}) {
         return __awaiter(this, void 0, void 0, function* () {
             const content = yield this.request(Object.assign(opts, { method: 'GET', uri }));
-            return content.toString();
+            const rawData = {
+                code: content.res.statusCode,
+                headers: content.res.headers,
+                data: content.buffer.toString(),
+                buffer: content.buffer,
+            };
+            return opts.raw ? rawData : rawData.data;
         });
     }
     static get_json(uri, opts = {}) {
         return __awaiter(this, void 0, void 0, function* () {
-            const content = yield this.request(Object.assign(opts, { method: 'GET', uri, parseJson: true }));
-            return JSON.parse(content.toString());
+            const content = yield this.request(Object.assign(opts, { method: 'GET', uri }));
+            const rawData = {
+                code: content.res.statusCode,
+                headers: content.res.headers,
+                data: JSON.parse(content.buffer.toString()),
+                buffer: content.buffer,
+            };
+            return opts.raw ? rawData : rawData.data;
         });
     }
     static post(uri, postData, opts = {}) {
         return __awaiter(this, void 0, void 0, function* () {
-            const content = yield this.request(Object.assign(opts, { method: 'POST', uri, postData }));
-            return content.toString();
+            const content = yield this.request(Object.assign(opts, { method: 'POST', uri }));
+            const rawData = {
+                code: content.res.statusCode,
+                headers: content.res.headers,
+                data: content.buffer.toString(),
+                buffer: content.buffer,
+            };
+            return opts.raw ? rawData : rawData.data;
         });
     }
     static post_json(uri, postData, opts = {}) {
         return __awaiter(this, void 0, void 0, function* () {
-            const content = yield this.request(Object.assign(opts, { method: 'POST', uri, postData, parseJson: true }));
-            return JSON.parse(content.toString());
+            const content = yield this.request(Object.assign(opts, { method: 'POST', uri }));
+            const rawData = {
+                code: content.res.statusCode,
+                headers: content.res.headers,
+                data: JSON.parse(content.buffer.toString()),
+                buffer: content.buffer,
+            };
+            return opts.raw ? rawData : rawData.data;
         });
     }
     static request(opts) {
@@ -86,10 +110,12 @@ class Request {
                 else if (res.statusCode && (res.statusCode == 200 ||
                     (opts.allowCode instanceof Array && opts.allowCode.includes(res.statusCode)) ||
                     (typeof opts.allowCode == 'function' && opts.allowCode(res.statusCode)))) { // 返回200
-                    let rawData = Buffer.alloc(0);
-                    res.on('data', (chunk) => { rawData = Buffer.concat([rawData, chunk]); });
+                    let buffer = Buffer.alloc(0);
+                    res.on('data', (chunk) => { buffer = Buffer.concat([buffer, chunk]); });
                     res.on('end', () => {
-                        resolve(rawData);
+                        resolve({
+                            buffer, res
+                        });
                     });
                 }
                 else { //错误代码

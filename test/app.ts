@@ -7,7 +7,8 @@ import https = require('https')
     // const back_baidu = await Request.get('https://baidu.com')
     // console.log(back_baidu)
     const back = await Request.get('https://api.github.com/users/pch18', {
-        debug: true
+        debug: true,
+        raw:true
     })
     console.log(back)
 })()
