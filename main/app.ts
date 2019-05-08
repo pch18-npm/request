@@ -5,7 +5,7 @@ import url = require('url')
 
 type stringQuery = { [x: string]: string }
 type baseQuery = { [x: string]: string | number }
-type superQuery = { [x: string]: baseQuery }
+type superQuery = { [x: string]: string | number | baseQuery }
 
 interface request_opts {
     method: 'GET' | 'POST',

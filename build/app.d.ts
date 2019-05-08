@@ -8,7 +8,7 @@ declare type baseQuery = {
     [x: string]: string | number;
 };
 declare type superQuery = {
-    [x: string]: baseQuery;
+    [x: string]: string | number | baseQuery;
 };
 interface request_opts {
     method: 'GET' | 'POST';
