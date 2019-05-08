@@ -66,7 +66,18 @@ class Request {
                 if (opts.cookies && res.headers['set-cookie']) {
                     opts.cookies.setRaw(res.headers['set-cookie']);
                 }
-                if (res.statusCode === 200) { // 返回200
+                const func_allowCode = () => {
+                    if (res.statusCode === 200) {
+                        return true;
+                    }
+                    else if (res.statusCode && opts.allowCode && opts.allowCode.includes(res.statusCode)) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                };
+                if (func_allowCode()) { // 返回200
                     let rawData = Buffer.alloc(0);
                     res.on('data', (chunk) => { rawData = Buffer.concat([rawData, chunk]); });
                     res.on('end', () => {

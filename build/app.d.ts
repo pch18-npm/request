@@ -23,6 +23,7 @@ interface request_opts {
         pass: string;
     };
     debug?: boolean;
+    allowCode?: number[];
     other?: http.RequestOptions | https.RequestOptions;
 }
 export declare class Request {
