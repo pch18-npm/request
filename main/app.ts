@@ -49,11 +49,11 @@ export class Request {
     }
 
     //get_json
-    static async get_json(uri: string, opts?: { [x in keyof request_opts]?: request_opts[x] }): Promise<string>
-    static async get_json(uri: string, opts: { [x in keyof request_opts]?: request_opts[x] } & { raw: true }): Promise<{
+    static async get_json<T>(uri: string, opts?: { [x in keyof request_opts]?: request_opts[x] }): Promise<T>
+    static async get_json<T>(uri: string, opts: { [x in keyof request_opts]?: request_opts[x] } & { raw: true }): Promise<{
         code: number
         headers: http.IncomingHttpHeaders
-        data: string
+        data: T
         buffer: Buffer
     }>
     static async get_json(uri: string, opts: any = {}) {
@@ -87,11 +87,11 @@ export class Request {
     }
 
     //post_json
-    static async post_json(uri: string, postData: superQuery, opts?: { [x in keyof request_opts]?: request_opts[x] }): Promise<string>
-    static async post_json(uri: string, postData: superQuery, opts: { [x in keyof request_opts]?: request_opts[x] } & { raw: true }): Promise<{
+    static async post_json<T>(uri: string, postData: superQuery, opts?: { [x in keyof request_opts]?: request_opts[x] }): Promise<T>
+    static async post_json<T>(uri: string, postData: superQuery, opts: { [x in keyof request_opts]?: request_opts[x] } & { raw: true }): Promise<{
         code: number
         headers: http.IncomingHttpHeaders
-        data: string
+        data: T
         buffer: Buffer
     }>
     static async post_json(uri: string, postData: superQuery, opts: any = {}) {

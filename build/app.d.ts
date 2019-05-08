@@ -40,17 +40,17 @@ export declare class Request {
         data: string;
         buffer: Buffer;
     }>;
-    static get_json(uri: string, opts?: {
+    static get_json<T>(uri: string, opts?: {
         [x in keyof request_opts]?: request_opts[x];
-    }): Promise<string>;
-    static get_json(uri: string, opts: {
+    }): Promise<T>;
+    static get_json<T>(uri: string, opts: {
         [x in keyof request_opts]?: request_opts[x];
     } & {
         raw: true;
     }): Promise<{
         code: number;
         headers: http.IncomingHttpHeaders;
-        data: string;
+        data: T;
         buffer: Buffer;
     }>;
     static post(uri: string, postData: superQuery, opts?: {
@@ -66,17 +66,17 @@ export declare class Request {
         data: string;
         buffer: Buffer;
     }>;
-    static post_json(uri: string, postData: superQuery, opts?: {
+    static post_json<T>(uri: string, postData: superQuery, opts?: {
         [x in keyof request_opts]?: request_opts[x];
-    }): Promise<string>;
-    static post_json(uri: string, postData: superQuery, opts: {
+    }): Promise<T>;
+    static post_json<T>(uri: string, postData: superQuery, opts: {
         [x in keyof request_opts]?: request_opts[x];
     } & {
         raw: true;
     }): Promise<{
         code: number;
         headers: http.IncomingHttpHeaders;
-        data: string;
+        data: T;
         buffer: Buffer;
     }>;
     static request(opts: request_opts): Promise<{
