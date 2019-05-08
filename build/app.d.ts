@@ -30,14 +30,14 @@ export declare class Request {
     }): Promise<string>;
     static get_json<T extends Object>(uri: string, opts?: {
         [x in keyof request_opts]?: request_opts[x];
-    }): Promise<T>;
+    }): Promise<any>;
     static post(uri: string, postData: superQuery, opts?: {
         [x in keyof request_opts]?: request_opts[x];
     }): Promise<string>;
     static post_json<T extends Object>(uri: string, postData: superQuery, opts?: {
         [x in keyof request_opts]?: request_opts[x];
-    }): Promise<T>;
-    static request(opts: request_opts): Promise<string>;
+    }): Promise<any>;
+    static request(opts: request_opts): Promise<Buffer>;
 }
 export declare class Cookies {
     private rows;

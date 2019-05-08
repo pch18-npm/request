@@ -27,18 +27,24 @@ interface request_opts {
 
 export class Request {
 
-    static get(uri: string, opts: { [x in keyof request_opts]?: request_opts[x] } = {}) {
-        return this.request(Object.assign(opts, { method: 'GET', uri }))
-    }
-    static get_json<T extends Object>(uri: string, opts: { [x in keyof request_opts]?: request_opts[x] } = {}) {
-        return this.request(Object.assign(opts, { method: 'GET', uri, parseJson: true })) as any as Promise<T>
+    static async get(uri: string, opts: { [x in keyof request_opts]?: request_opts[x] } = {}) {
+        const content = await this.request(Object.assign(opts, { method: 'GET', uri }))
+        return content.toString()
     }
 
-    static post(uri: string, postData: superQuery, opts: { [x in keyof request_opts]?: request_opts[x] } = {}) {
-        return this.request(Object.assign(opts, { method: 'POST', uri, postData }))
+    static async get_json<T extends Object>(uri: string, opts: { [x in keyof request_opts]?: request_opts[x] } = {}) {
+        const content = await this.request(Object.assign(opts, { method: 'GET', uri, parseJson: true })) as any as Promise<T>
+        return JSON.parse(content.toString())
     }
-    static post_json<T extends Object>(uri: string, postData: superQuery, opts: { [x in keyof request_opts]?: request_opts[x] } = {}) {
-        return this.request(Object.assign(opts, { method: 'POST', uri, postData, parseJson: true })) as any as Promise<T>
+
+    static async post(uri: string, postData: superQuery, opts: { [x in keyof request_opts]?: request_opts[x] } = {}) {
+        const content = await this.request(Object.assign(opts, { method: 'POST', uri, postData }))
+        return content.toString()
+    }
+
+    static async post_json<T extends Object>(uri: string, postData: superQuery, opts: { [x in keyof request_opts]?: request_opts[x] } = {}) {
+        const content = await this.request(Object.assign(opts, { method: 'POST', uri, postData, parseJson: true })) as any as Promise<T>
+        return JSON.parse(content.toString())
     }
 
     static request(opts: request_opts) {
@@ -56,38 +62,31 @@ export class Request {
             throw new Error(`请求的uri必须是http://或者https://开头,传入的[${opts.uri}]不能识别`)
         }
 
-        return new Promise<string>((resolve, reject) => {
+        return new Promise<Buffer>((resolve, reject) => {
             const req = httpORs.request(opts.uri, Object.assign(
                 {},
                 opts.other || {},
                 opts.auth ? { auth: `${opts.auth.user}:${opts.auth.pass}` } : {},
                 {
                     method: opts.method,
-                    headers: Object.assign({}, opts.headers, opts.cookies ? { Cookie: opts.cookies.stringify() } : {}),
+                    headers: Object.assign(
+                        {
+                            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36'
+                        },
+                        opts.headers,
+                        opts.cookies ? { Cookie: opts.cookies.stringify() } : {}
+                    ),
                 }
             ), async (res) => {
-                // res.setEncoding('utf8')
                 // console.log(res)
                 if (opts.cookies && res.headers['set-cookie']) {
                     opts.cookies.setRaw(res.headers['set-cookie'])
                 }
                 if (res.statusCode === 200) { // 返回200
-                    let rawData = '';
-                    res.on('data', (chunk) => { rawData += chunk; });
+                    let rawData = Buffer.alloc(0);
+                    res.on('data', (chunk) => { rawData = Buffer.concat([rawData, chunk]) });
                     res.on('end', () => {
-                        if (opts.parseJson) {
-                            try {
-                                rawData = JSON.parse(rawData)
-                                resolve(rawData)
-                            } catch{
-                                reject(Object.assign(
-                                    new Error(`json解析失败 => ${rawData}`),
-                                    { data: rawData }
-                                ))
-                            }
-                        } else {
-                            resolve(rawData)
-                        }
+                        resolve(rawData)
                     })
                 } else if (res.statusCode === 301 || res.statusCode === 302) { //返回跳转
                     let jumpUri = null

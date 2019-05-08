@@ -14,16 +14,28 @@ const qs = require("querystring");
 const url = require("url");
 class Request {
     static get(uri, opts = {}) {
-        return this.request(Object.assign(opts, { method: 'GET', uri }));
+        return __awaiter(this, void 0, void 0, function* () {
+            const content = yield this.request(Object.assign(opts, { method: 'GET', uri }));
+            return content.toString();
+        });
     }
     static get_json(uri, opts = {}) {
-        return this.request(Object.assign(opts, { method: 'GET', uri, parseJson: true }));
+        return __awaiter(this, void 0, void 0, function* () {
+            const content = yield this.request(Object.assign(opts, { method: 'GET', uri, parseJson: true }));
+            return JSON.parse(content.toString());
+        });
     }
     static post(uri, postData, opts = {}) {
-        return this.request(Object.assign(opts, { method: 'POST', uri, postData }));
+        return __awaiter(this, void 0, void 0, function* () {
+            const content = yield this.request(Object.assign(opts, { method: 'POST', uri, postData }));
+            return content.toString();
+        });
     }
     static post_json(uri, postData, opts = {}) {
-        return this.request(Object.assign(opts, { method: 'POST', uri, postData, parseJson: true }));
+        return __awaiter(this, void 0, void 0, function* () {
+            const content = yield this.request(Object.assign(opts, { method: 'POST', uri, postData, parseJson: true }));
+            return JSON.parse(content.toString());
+        });
     }
     static request(opts) {
         const url_data = url.parse(opts.uri);
@@ -44,29 +56,19 @@ class Request {
         return new Promise((resolve, reject) => {
             const req = httpORs.request(opts.uri, Object.assign({}, opts.other || {}, opts.auth ? { auth: `${opts.auth.user}:${opts.auth.pass}` } : {}, {
                 method: opts.method,
-                headers: Object.assign({}, opts.headers, opts.cookies ? { Cookie: opts.cookies.stringify() } : {}),
+                headers: Object.assign({
+                    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36'
+                }, opts.headers, opts.cookies ? { Cookie: opts.cookies.stringify() } : {}),
             }), (res) => __awaiter(this, void 0, void 0, function* () {
-                // res.setEncoding('utf8')
                 // console.log(res)
                 if (opts.cookies && res.headers['set-cookie']) {
                     opts.cookies.setRaw(res.headers['set-cookie']);
                 }
                 if (res.statusCode === 200) { // 返回200
-                    let rawData = '';
-                    res.on('data', (chunk) => { rawData += chunk; });
+                    let rawData = Buffer.alloc(0);
+                    res.on('data', (chunk) => { rawData = Buffer.concat([rawData, chunk]); });
                     res.on('end', () => {
-                        if (opts.parseJson) {
-                            try {
-                                rawData = JSON.parse(rawData);
-                                resolve(rawData);
-                            }
-                            catch (_a) {
-                                reject(Object.assign(new Error(`json解析失败 => ${rawData}`), { data: rawData }));
-                            }
-                        }
-                        else {
-                            resolve(rawData);
-                        }
+                        resolve(rawData);
                     });
                 }
                 else if (res.statusCode === 301 || res.statusCode === 302) { //返回跳转
